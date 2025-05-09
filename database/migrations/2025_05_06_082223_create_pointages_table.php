@@ -10,16 +10,16 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('pointages', function (Blueprint $table) {
-            $table->id();
-            $table->dateTime('pointe_debut');
-            $table->dateTime('pointe_depart')->nullable();
-            $table->text('description')->nullable();
-            $table->foreignId('employe_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('pointages', function (Blueprint $table) {
+        $table->id();
+        $table->dateTime('pointe_fin')->nullable();    
+        $table->dateTime('pointe_debut')->nullable();
+        $table->text('description')->nullable();
+        $table->foreignId('employe_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
+        $table->timestamps();
+    });
+}
 
     /**
      * Reverse the migrations.

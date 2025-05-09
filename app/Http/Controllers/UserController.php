@@ -106,7 +106,7 @@ class UserController extends Controller
 
          $user = User::create($input);
 
-         $user->assignRole('admin'); // Assign default role
+         $user->assignRole('employe'); // Assign default role
 
          // Prepare email details
 

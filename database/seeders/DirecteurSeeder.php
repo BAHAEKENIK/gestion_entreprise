@@ -29,7 +29,6 @@ class DirecteurSeeder extends Seeder
                 'post' => 'Directeur Général',
                 'avatar' => 'D:\gestion_entreprise_stage\storage\app\public\téléchargement.jpeg',
                 'statut' => 'actif',
-                'role' => 'directeur',
                 'password' => Hash::make('password'),
 
                 'date_embauche' => now()->subYear(),

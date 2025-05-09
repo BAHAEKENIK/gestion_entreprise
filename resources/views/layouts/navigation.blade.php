@@ -7,17 +7,36 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ route('dashboard') }}">
                         <img src="{{ asset('images/logo.png') }}" alt="logo.png" class="h-20 mx-auto mt-5 mb-5">
+
                     </a>
                 </div>
-
-                <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+
+
+                    @hasrole('employe')
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index')">
-                        {{ __('users') }}
+                        <x-nav-link :href="route('pointages.index')" :active="request()->routeIs('pointages.index')">
+                            {{ __('Mon Pointage') }}
+                        </x-nav-link>
+                    @endhasrole
+
+                    @hasrole('directeur')
+                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                        {{ __('Dashboard') }}
                     </x-nav-link>
+                        <x-nav-link :href="route('pointages.index')" :active="request()->routeIs('pointages.index') || request()->routeIs('pointages.historique.employe')">
+                            {{ __('Suivi Pointages') }}
+                        </x-nav-link>
+                        {{-- Lien vers la gestion des utilisateurs et des rôles --}}
+                        <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.index') || request()->routeIs('users.create') || request()->routeIs('users.edit')">
+                            {{ __('Utilisateurs') }}
+                        </x-nav-link>
+                        <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index') || request()->routeIs('roles.create') || request()->routeIs('roles.edit')">
+                            {{ __('Rôles') }}
+                        </x-nav-link>
+                    @endhasrole
                 </div>
             </div>
 
@@ -73,6 +92,24 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+
+            @hasrole('employe')
+                <x-responsive-nav-link :href="route('pointages.index')" :active="request()->routeIs('pointages.index')">
+                    {{ __('Mon Pointage') }}
+                </x-responsive-nav-link>
+            @endhasrole
+
+            @hasrole('directeur')
+                <x-responsive-nav-link :href="route('pointages.index')" :active="request()->routeIs('pointages.index') || request()->routeIs('pointages.historique.employe')">
+                    {{ __('Suivi Pointages') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('users.index')" :active="request()->routeIs('users.index') || request()->routeIs('users.create') || request()->routeIs('users.edit')">
+                    {{ __('Utilisateurs') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.index') || request()->routeIs('roles.create') || request()->routeIs('roles.edit')">
+                    {{ __('Rôles') }}
+                </x-responsive-nav-link>
+            @endhasrole
         </div>
 
         <!-- Responsive Settings Options -->

@@ -32,9 +32,6 @@ class PermissionseSeeder extends Seeder
             'user-create',
              'user-edit',
             'user-delete',
-
-
-
         ];
 
 
@@ -46,9 +43,9 @@ class PermissionseSeeder extends Seeder
         }
         $user = User::create([
 
-            'name' => 'Hardik Savani',
+            'name' => 'Bahae Kenikssi',
 
-            'email' => 'admin@gmail.com',
+            'email' => 'bahaekenik@gmail.com',
 
             'password' => bcrypt('123456')
 
@@ -57,8 +54,7 @@ class PermissionseSeeder extends Seeder
 
 
         $role = Role::create(['name' => 'directeur']);
-
-
+        Role::create(['name'=>'employe']);
 
         $permissions = Permission::pluck('id','id')->all();
 

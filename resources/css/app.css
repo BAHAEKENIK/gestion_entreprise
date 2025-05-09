@@ -1,3 +1,33 @@
+/* resources/css/app.css */
+
+/* Importations Tailwind existantes */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Vos styles personnalisés ci-dessous */
+
+/* Style pour le corps des pages authentifiées */
+body.app-layout {
+    background-image: url('/images/votre-image-auth.jpg'); /* Chemin relatif au dossier public */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed; /* L'image reste fixe au scroll */
+}
+
+/* Optionnel: Rendre la barre de navigation semi-transparente */
+/* Si vous voulez que l'image de fond apparaisse derrière la barre de navigation */
+/* .app-nav-transparent {
+    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm;
+} */
+
+/* Optionnel: Rendre l'en-tête de page semi-transparent */
+/* .app-header-transparent {
+    @apply bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm;
+} */
+
+/* Optionnel: Donner un fond semi-transparent au contenu principal pour la lisibilité */
+/* .main-content-area {
+    @apply bg-white/50 dark:bg-gray-900/50 p-6 rounded-lg shadow-lg;
+} */
