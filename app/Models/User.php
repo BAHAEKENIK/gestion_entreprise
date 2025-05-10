@@ -43,7 +43,7 @@ class User extends Authenticatable
         'must_change_password' => 'boolean',
     ];
 
-    // Relation avec Pointages
+    
     public function pointages(): HasMany
     {
         return $this->hasMany(Pointage::class, 'employe_id');

@@ -32,7 +32,7 @@ class PointageController extends Controller
             $pointages = $query->paginate(15);
             $employes = User::whereHas('roles', function ($q) {
                 $q->where('name', 'employe');
-            })->orderBy('name')->get(); // Pour le filtre
+            })->orderBy('name')->get();
 
             return view('pointages.index_directeur', compact('pointages', 'employes', 'selectedDate'));
 
@@ -46,7 +46,7 @@ class PointageController extends Controller
 
             $historiquePointages = Pointage::where('employe_id', $user->id)
                 ->orderBy('pointe_debut', 'desc')
-                ->paginate(10); // Paginer l'historique
+                ->paginate(10);
 
             return view('pointages.index_employe', compact('pointageActif', 'historiquePointages'));
         }

@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('titre');
             $table->text('description')->nullable();
-            $table->enum('statut',['a_faire','enn_cours','terminee','en_revision','annulee']);
+            $table->enum('statut',['a_faire','en_cours','terminee','en_revision','annulee']);
             $table->dateTime('date_assignation')->useCurrent();
             $table->dateTime('date_debut_prevue')->nullable();
             $table->dateTime('date_fin_prevue')->nullable();
-            $table->dateTime('date_completion');
+            $table->dateTime('date_completion')->nullable();
             $table->string('duree_estimee')->nullable();
             $table->foreignId('employe_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('directeur_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');

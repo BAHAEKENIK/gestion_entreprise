@@ -47,6 +47,11 @@ Route::middleware('auth')->group(function () {
     Route::get('pointages/historique/{user}', [PointageController::class, 'historiqueEmploye'])
         ->middleware('role:directeur') // Seul le directeur peut voir l'historique des autres
         ->name('pointages.historique.employe');
+    Route::resource('taches',TacheController::class);
+
+    Route::patch('taches/{tache}/update-status',[TacheController::class,'updateEmployeStatus'])->name('taches.updateEmployeStatus');
+    Route::post('taches/{tache}/upload-document',[TacheController::class,'uploadDocumentEmploye'])->name('taches.uploadDocumentEmploye');
+    Route::delete('documents/{document}',[TacheController::class,'destroyDocument'])->name('documents.destroy');
 });
 
 require __DIR__.'/auth.php';
