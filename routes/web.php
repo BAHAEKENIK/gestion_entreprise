@@ -42,6 +42,13 @@ Route::middleware('auth')->group(function () { // OUVERTURE 1
     Route::middleware(['role:directeur'])->group(function () { // OUVERTURE 2
         Route::resource('users', UserController::class);
         Route::resource('roles', RoleController::class);
+        // Dans routes/web.php, à l'intérieur de Route::middleware(['role:directeur'])->group(...)
+
+// ... vos routes existantes pour users, roles, taches, pointages ...
+
+Route::get('/users-export', [UserController::class, 'exportUsers'])->name('users.export');
+        Route::get('/users-import', [UserController::class, 'importUsersForm'])->name('users.import.form');
+        Route::post('/users-import', [UserController::class, 'importUsers'])->name('users.import');
 
         // Routes Tâches pour Directeur
         Route::get('taches/creer/{user?}', [TacheController::class, 'create'])->name('taches.create');
@@ -79,6 +86,6 @@ Route::middleware('auth')->group(function () { // OUVERTURE 1
     Route::get('/change-password', [ChangePasswordController::class, 'showChangePasswordForm'])->name('password.change.form');
     Route::post('/change-password', [ChangePasswordController::class, 'changePassword'])->name('password.change.submit');
 
-}); 
+});
 
 require __DIR__.'/auth.php';

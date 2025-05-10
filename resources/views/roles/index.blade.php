@@ -5,7 +5,7 @@
                 {{ __('Gestion des Rôles') }}
             </h2>
             @can('role-create')
-                <a href="{{ route('roles.create') }}"
+                <a style="color: lightgreen" href="{{ route('roles.create') }}"
                    class="inline-flex items-center px-4 py-2 bg-green-500 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-600 active:bg-green-700 focus:outline-none focus:border-green-700 focus:ring ring-green-300 disabled:opacity-25 transition ease-in-out duration-150">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -187,7 +187,7 @@
 
                     @if($roles->count() > 0)
                     <div class="overflow-x-auto">
-                        <table class="custom-role-table min-w-full">
+                        <table style="width: 100%" class="custom-role-table min-w-full">
                             <thead class="dark:bg-gray-700"> {{-- Tailwind pour le thead --}}
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-100 dark:text-gray-300 uppercase tracking-wider bg-gray-700 dark:bg-gray-900">Nom du Rôle</th>
