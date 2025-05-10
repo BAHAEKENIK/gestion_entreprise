@@ -32,6 +32,7 @@ class PermissionseSeeder extends Seeder
             'user-create',
              'user-edit',
             'user-delete',
+            'tache-create'
         ];
 
 

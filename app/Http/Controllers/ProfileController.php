@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Validation\Rule; // Pour la validation du thème
 
 class ProfileController extends Controller
 {
@@ -24,19 +25,45 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
+    public function update(ProfileUpdateRequest $request): RedirectResponse // ProfileUpdateRequest gère name et email
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $validatedData = $request->validated(); // Contient name et email validés
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
-            
+        // Gérer la mise à jour du téléphone si envoyé
+        if ($request->has('telephone')) {
+            $request->validate(['telephone' => 'nullable|string|max:20']);
+            $validatedData['telephone'] = $request->telephone;
         }
 
-        $request->user()->save();
+        $user->fill($validatedData);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
+
+    /**
+     * Update the user's theme preference.
+     * Nouvelle méthode pour gérer spécifiquement le thème.
+     */
+    public function updateTheme(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'theme' => ['required', Rule::in(['light', 'dark'])],
+        ]);
+
+        $user = $request->user();
+        $user->theme = $request->theme;
+        $user->save();
+
+        return Redirect::route('profile.edit')->with('status', 'theme-updated');
+    }
+
 
     /**
      * Delete the user's account.

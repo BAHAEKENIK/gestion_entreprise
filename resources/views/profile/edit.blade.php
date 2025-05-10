@@ -1,52 +1,6 @@
-@section('styles')
-<style>
-    body {
-        background-image: url('{{ asset('images/Site-UITS-a-propo.png') }}');
-        background-size: cover;
-        background-position: center;
-        background-repeat: no-repeat;
-        min-height: 100vh;
-        margin: 0;
-        backdrop-filter: brightness(0.5); /* assombrit */
-    }
-
-    /* Theme Toggle Button */
-    #theme-toggle {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background-color: #007bff;
-        border: none;
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 1000;
-        cursor: pointer;
-        transition: all 0.4s ease;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
-
-    #theme-toggle.clicked {
-        background-color: #ff6347;
-        transform: translateX(80px);
-    }
-
-    #theme-toggle:hover {
-        opacity: 0.9;
-    }
-
-    body.light-theme {
-        backdrop-filter: brightness(1);
-    }
-
-    body.dark-theme {
-        backdrop-filter: brightness(0.5);
-    }
-</style>
-@endsection
-
 <x-app-layout>
-    <button id="theme-toggle"></button>
+    {{-- Le bouton de thème est maintenant dans layouts.app.blade.php --}}
+    {{-- <button id="theme-toggle"></button> --}} {{-- Supprimez cette ligne si elle y était --}}
 
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
@@ -58,6 +12,7 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             <div class="p-4 sm:p-8 bg-white dark:bg-gray-800 shadow sm:rounded-lg">
                 <div class="max-w-xl">
+                    {{-- Inclure le formulaire de mise à jour des informations du profil --}}
                     @include('profile.partials.update-profile-information-form')
                 </div>
             </div>
@@ -75,5 +30,46 @@
             </div>
         </div>
     </div>
-    
+
+    {{-- Le script SweetAlert peut rester ici ou être déplacé dans layouts.app.blade.php si utilisé globalement --}}
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            @if (session('status') === 'profile-updated')
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Profil Mis à Jour!',
+                    toast: true, // Pour un affichage moins intrusif
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    customClass: { popup: 'dark:bg-gray-800 dark:text-gray-200' }
+                });
+            @elseif (session('status') === 'password-updated')
+                 Swal.fire({
+                    icon: 'success',
+                    title: 'Mot de Passe Mis à Jour!',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    customClass: { popup: 'dark:bg-gray-800 dark:text-gray-200' }
+                });
+            @elseif (session('status') === 'theme-updated')
+                 Swal.fire({
+                    icon: 'success',
+                    title: 'Thème Mis à Jour!',
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 2000, // Plus court pour le thème
+                    timerProgressBar: true,
+                    customClass: { popup: 'dark:bg-gray-800 dark:text-gray-200' }
+                });
+            @endif
+        });
+    </script>
+    @endpush
 </x-app-layout>

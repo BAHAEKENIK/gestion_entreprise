@@ -1,3 +1,4 @@
+{{-- resources/views/profile/partials/update-profile-information-form.blade.php --}}
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
@@ -32,12 +33,10 @@
                 <div>
                     <p class="text-sm mt-2 text-gray-800 dark:text-gray-200">
                         {{ __('Your email address is unverified.') }}
-
                         <button form="send-verification" class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800">
                             {{ __('Click here to re-send the verification email.') }}
                         </button>
                     </p>
-
                     @if (session('status') === 'verification-link-sent')
                         <p class="mt-2 font-medium text-sm text-green-600 dark:text-green-400">
                             {{ __('A new verification link has been sent to your email address.') }}
@@ -50,38 +49,41 @@
         <!-- Champ Téléphone (modifiable) -->
         <div>
             <x-input-label for="telephone" :value="__('Telephone')" />
-            <x-text-input id="telephone" name="telephone" type="text" class="mt-1 block w-full" :value="old('telephone', $user->telephone)" autocomplete="tel" />
+            <x-text-input id="telephone" name="telephone" type="tel" class="mt-1 block w-full" :value="old('telephone', $user->telephone)" autocomplete="tel" />
             <x-input-error class="mt-2" :messages="$errors->get('telephone')" />
         </div>
 
+        <!-- Champ Poste (modifiable par le directeur, non par l'utilisateur ici) -->
+        @if($user->post)
+        <div>
+            <x-input-label for="post_display" :value="__('Poste')" />
+            <x-text-input id="post_display" type="text" class="mt-1 block w-full bg-gray-100 dark:bg-gray-700 cursor-not-allowed" :value="$user->post" disabled />
+        </div>
+        @endif
+
         <!-- Champ Date d'embauche (non modifiable) -->
         <div>
-            <x-input-label for="date_embauche" :value="__('Hiring Date')" />
+            <x-input-label for="date_embauche_display" :value="__('Date d\'embauche')" />
             <x-text-input
-                id="date_embauche"
-                name="date_embauche_display" {{-- Nom différent pour éviter la soumission ou pas de nom du tout --}}
+                id="date_embauche_display"
                 type="text"
                 class="mt-1 block w-full bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                :value="$user->date_embauche ? $user->date_embauche->format('d/m/Y') : __('N/A')"
-                disabled {{-- L'attribut disabled empêche la modification et la soumission --}}
+                :value="$user->date_embauche ? \Carbon\Carbon::parse($user->date_embauche)->format('d/m/Y') : __('N/A')"
+                disabled
             />
-            {{-- Pas besoin de x-input-error car il n'est pas soumis --}}
         </div>
 
-        <!-- Champ Rôle (non modifiable) -->
+        <!-- Champ Rôle (non modifiable ici) -->
         <div>
-            <x-input-label for="role" :value="__('Role')" />
+            <x-input-label for="role_display" :value="__('Rôle(s)')" />
             <x-text-input
-                id="role"
-                name="role_display" {{-- Nom différent pour éviter la soumission ou pas de nom du tout --}}
+                id="role_display"
                 type="text"
                 class="mt-1 block w-full bg-gray-100 dark:bg-gray-700 cursor-not-allowed"
-                :value="$user->role ?? __('N/A')"
-                disabled {{-- L'attribut disabled empêche la modification et la soumission --}}
+                :value="$user->getRoleNames()->isNotEmpty() ? $user->getRoleNames()->implode(', ') : __('N/A')"
+                disabled
             />
-            {{-- Pas besoin de x-input-error car il n'est pas soumis --}}
         </div>
-
 
         <div class="flex items-center gap-4">
             <x-primary-button>{{ __('Save') }}</x-primary-button>
@@ -91,7 +93,7 @@
                     x-data="{ show: true }"
                     x-show="show"
                     x-transition
-                    x-init="setTimeout(() => show = false, 2000)"
+                    x-init="setTimeout(() => show = false, 3000)"
                     class="text-sm text-gray-600 dark:text-gray-400"
                 >{{ __('Saved.') }}</p>
             @endif

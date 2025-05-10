@@ -1,33 +1,71 @@
 /* resources/css/app.css */
 
-/* Importations Tailwind existantes */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Vos styles personnalisés ci-dessous */
+/* Vos styles personnalisés pour le thème et le body */
+/* Assurez-vous que les chemins vers les images sont corrects par rapport à votre dossier public */
 
-/* Style pour le corps des pages authentifiées */
-body.app-layout {
-    background-image: url('/images/votre-image-auth.jpg'); /* Chemin relatif au dossier public */
+body {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed; /* L'image reste fixe au scroll */
+    min-height: 100vh;
+    margin: 0;
+    transition: backdrop-filter 0.5s ease-in-out, background-image 0.5s ease-in-out;
 }
 
-/* Optionnel: Rendre la barre de navigation semi-transparente */
-/* Si vous voulez que l'image de fond apparaisse derrière la barre de navigation */
-/* .app-nav-transparent {
-    @apply bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm;
-} */
+/* Styles pour le thème clair */
+html.light body {
+    background-image: url('/images/Site-UITS-a-propo.png'); /* Assurez-vous que ce chemin est correct depuis public/ */
+    backdrop-filter: brightness(1);
+}
+html.light #theme-toggle-icon { /* Icône pour thème clair */
+    color: #1f2937; /* dark-gray-800 */
+}
+html.light #theme-toggle-button {
+    background-color: rgba(229, 231, 235, 0.7); /* gray-200 semi-transparent */
+    border: 1px solid rgba(209, 213, 219, 0.5); /* gray-300 */
+}
+html.light #theme-toggle-button:hover {
+    background-color: rgba(209, 213, 219, 0.9); /* gray-300 */
+}
 
-/* Optionnel: Rendre l'en-tête de page semi-transparent */
-/* .app-header-transparent {
-    @apply bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm;
-} */
 
-/* Optionnel: Donner un fond semi-transparent au contenu principal pour la lisibilité */
-/* .main-content-area {
-    @apply bg-white/50 dark:bg-gray-900/50 p-6 rounded-lg shadow-lg;
-} */
+/* Styles pour le thème sombre */
+html.dark body {
+    background-image: url('/images/votre-image-sombre.png'); /* REMPLACEZ par votre image pour le thème sombre, correct depuis public/ */
+    backdrop-filter: brightness(0.5);
+}
+html.dark #theme-toggle-icon { /* Icône pour thème sombre */
+    color: #f3f4f6; /* gray-100 */
+}
+html.dark #theme-toggle-button {
+    background-color: rgba(55, 65, 81, 0.7); /* gray-700 semi-transparent */
+    border: 1px solid rgba(75, 85, 99, 0.5); /* gray-600 */
+}
+html.dark #theme-toggle-button:hover {
+    background-color: rgba(75, 85, 99, 0.9); /* gray-600 */
+}
+
+
+/* Theme Toggle Button - Style commun */
+#theme-toggle-button {
+    position: fixed;
+    top: 1.25rem; /* 20px */
+    right: 1.25rem; /* 20px */
+    z-index: 50; /* z-50 de Tailwind */
+    padding: 0.5rem; /* p-2 */
+    border-radius: 9999px; /* rounded-full */
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+    /* Les couleurs de fond et de bordure sont définies par html.light et html.dark ci-dessus */
+}
+
+#theme-toggle-icon {
+    width: 1.5rem; /* w-6 */
+    height: 1.5rem; /* h-6 */
+    /* La couleur est définie par html.light et html.dark ci-dessus */
+}
