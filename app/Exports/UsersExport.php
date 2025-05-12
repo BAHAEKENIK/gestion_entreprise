@@ -17,12 +17,10 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
     */
     public function collection()
     {
-        // Exporter uniquement les utilisateurs qui ont le rôle 'employe'
-        // et ne sont pas des directeurs. Ajustez la logique si nécessaire.
         return User::whereHas('roles', function ($query) {
             $query->where('name', 'employe');
         })
-        ->whereDoesntHave('roles', function ($query) { // Optionnel: pour être sûr
+        ->whereDoesntHave('roles', function ($query) {
             $query->where('name', 'directeur');
         })
         ->orderBy('name')
@@ -42,9 +40,7 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
             'Poste',
             'Statut',
             'Date d\'embauche',
-            'Rôles', // Sera une chaîne des rôles
-            // 'Thème', // Peut-être pas pertinent pour l'export de gestion
-            // 'Doit changer mot de passe',
+            'Rôles',
         ];
     }
 
@@ -62,9 +58,7 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
             $user->post,
             ucfirst($user->statut),
             $user->date_embauche ? \Carbon\Carbon::parse($user->date_embauche)->format('d/m/Y') : '',
-            $user->getRoleNames()->implode(', '), // Affiche les rôles séparés par une virgule
-            // $user->theme,
-            // $user->must_change_password ? 'Oui' : 'Non',
+            $user->getRoleNames()->implode(', '),
         ];
     }
 
@@ -83,12 +77,10 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
                 'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
                 'fill' => [
                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['argb' => 'FF4F4F4F'], // Gris foncé
+                    'startColor' => ['argb' => 'FF4F4F4F'], 
                 ],
             ],
-
-            // Appliquer des bordures à toutes les cellules de données
-            'A1:H' . ($this->collection()->count() + 1) => [ // Ajustez H si vous avez plus de colonnes
+            'A1:H' . ($this->collection()->count() + 1) => [
                 'borders' => [
                     'allBorders' => [
                         'borderStyle' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
