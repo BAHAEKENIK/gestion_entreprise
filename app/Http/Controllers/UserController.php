@@ -9,20 +9,19 @@ use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
-use Maatwebsite\Excel\Facades\Excel; // <-- Importer Excel
-use App\Exports\UsersExport;          // <-- Importer votre classe d'export
-use App\Imports\UsersImport;          // <-- Importer votre classe d'import
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\UsersExport;
+use App\Imports\UsersImport;
 
 class UserController extends Controller
 {
     function __construct()
     {
          $this->middleware('permission:user-list|user-create|user-edit|user-delete', ['only' => ['index']]);
-         // Assurez-vous que les permissions pour import/export sont ici si différentes de user-create/user-list
          $this->middleware('permission:user-create', ['only' => ['create','store', 'importUsersForm', 'importUsers']]);
          $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
          $this->middleware('permission:user-delete', ['only' => ['destroy']]);
-         $this->middleware('permission:user-export', ['only' => ['exportUsers']]); // Permission spécifique pour l'export
+         $this->middleware('permission:user-export', ['only' => ['exportUsers']]);
     }
 
     public function index(Request $request)
@@ -32,8 +31,6 @@ class UserController extends Controller
         $query->whereDoesntHave('roles', function ($q_roles) {
             $q_roles->where('name', 'directeur');
         });
-        // Exclure l'utilisateur directeur actuellement connecté de la liste des "employés" à gérer
-        // $query->where('id', '!=', auth()->id());
 
 
         if ($request->filled('search')) {
@@ -43,11 +40,9 @@ class UserController extends Controller
                          ->orWhere('email', 'LIKE', "%{$searchTerm}%");
             });
         }
+        $users = $query->orderBy('name')->paginate($request->input('per_page', 7));
 
-        // Renommé en $users pour correspondre à la vue que vous avez fournie
-        $users = $query->orderBy('name')->paginate($request->input('per_page', 7)); // Pagination à 7
-
-        return view('users.index',compact('users')) // Changé de $data à $users
+        return view('users.index',compact('users'))
             ->with('i', ($request->input('page', 1) - 1) * $users->perPage());
     }
 
@@ -81,14 +76,12 @@ class UserController extends Controller
 
         if ($request->has('roles') && is_array($request->input('roles'))) {
             $rolesToAssign = $request->input('roles');
-            // Éviter d'assigner le rôle 'directeur' via ce formulaire si ce n'est pas souhaité
-            if (in_array('directeur', $rolesToAssign) && !$request->user()->hasRole('super-admin')) { // Exemple
-                // Ne pas assigner 'directeur' ou lever une erreur
+            if (in_array('directeur', $rolesToAssign) && !$request->user()->hasRole('super-admin')) {
                 $rolesToAssign = array_diff($rolesToAssign, ['directeur']);
             }
             $user->assignRole($rolesToAssign);
         } else {
-            $user->assignRole('employe'); // Rôle par défaut
+            $user->assignRole('employe');
         }
 
         return redirect()->route('users.index')
@@ -110,8 +103,6 @@ class UserController extends Controller
          if (!$user || ($user->hasRole('directeur') && auth()->id() !== $user->id && !auth()->user()->hasRole('super-admin'))) {
              return redirect()->route('users.index')->with('error', 'Utilisateur non trouvé ou non autorisé à modifier.');
         }
-        // $roles = Role::pluck('name','name')->all();
-        // Exclure le rôle 'directeur' de la liste des rôles modifiables (sauf si super-admin)
         $queryRoles = Role::query();
         if (!auth()->user()->hasRole('super-admin')) {
             $queryRoles->where('name', '!=', 'directeur');
@@ -132,7 +123,7 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-            'password' => 'nullable|string|min:8|confirmed', // 'confirmed' au lieu de 'same:confirm-password' si le champ est password_confirmation
+            'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'required|array',
             'roles.*' => 'string|exists:roles,name',
             'telephone' => 'nullable|string|max:20',
@@ -148,14 +139,10 @@ class UserController extends Controller
         $user->update($input);
 
         $newRoles = $request->input('roles');
-        // Logique pour empêcher la modification du rôle directeur si ce n'est pas un super-admin
         if (in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
-            // Conserver les rôles existants de l'utilisateur ou lever une erreur
-            // Pour l'instant, on laisse passer si le formulaire le permet.
+
         } else if (in_array('directeur', $user->getRoleNames()->toArray()) && !in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
-            // Empêcher de retirer le rôle directeur à un directeur (sauf par super-admin)
-            // return redirect()->back()->with('error', 'Vous ne pouvez pas retirer le rôle directeur.');
-            // Pour l'instant, on laisse passer si le formulaire le permet.
+
         }
         $user->syncRoles($newRoles);
 
@@ -209,21 +196,7 @@ class UserController extends Controller
             $import = new UsersImport();
             Excel::import($import, $request->file('excel_file'));
 
-            // Après l'import, on doit assigner le rôle 'employe' aux utilisateurs créés si ce n'est pas fait dans UsersImport
-            // Cette partie est délicate si UsersImport retourne juste des modèles.
-            // Pour l'instant, on va supposer que UsersImport sauvegarde l'utilisateur et qu'on peut le récupérer.
-            // Une meilleure approche est de faire l'assignation de rôle dans UsersImport.
-            // OU, si UsersImport utilise `WithEvents` et `AfterImport`, on peut écouter cet événement.
-
-            // Si UsersImport retourne les IDs des utilisateurs créés :
-            // $createdUserIds = $import->getCreatedUserIds(); // Méthode à ajouter à UsersImport
-            // User::whereIn('id', $createdUserIds)->each(function ($user) {
-            //     if (!$user->hasAnyRole(Role::all())) { // N'assigner que s'il n'a pas déjà de rôle
-            //         $user->assignRole('employe');
-            //     }
-            // });
-            // Note: Le plus simple est de modifier UsersImport pour qu'il assigne 'employe' par défaut.
-            // Ou que UsersImport gère la logique de rôle si une colonne 'role' est dans l'Excel.
+           
 
             $importedCount = $import->getImportedRowCount();
             $skippedCount = count($import->getSkippedRows());

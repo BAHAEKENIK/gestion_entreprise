@@ -16,12 +16,6 @@ class TacheController extends Controller
     {
         $this->middleware('auth');
     }
-
-    // ============== POUR LE DIRECTEUR ==============
-
-    /**
-     * Affiche la liste des tâches (vue directeur) avec filtres.
-     */
     public function indexDirecteur(Request $request)
     {
         $query = Tache::with(['employeAssignee', 'assignePar', 'documents'])
@@ -140,13 +134,6 @@ class TacheController extends Controller
 
         return redirect()->route('taches.directeur.index')->with('success', 'Tâche mise à jour avec succès.');
     }
-
-
-    // ============== POUR L'EMPLOYÉ ==============
-
-    /**
-     * Affiche la liste des tâches pour l'employé connecté.
-     */
     public function indexEmploye(Request $request)
     {
         $user = Auth::user();
