@@ -21,7 +21,7 @@ class UserController extends Controller
          $this->middleware('permission:user-create', ['only' => ['create','store', 'importUsersForm', 'importUsers']]);
          $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
          $this->middleware('permission:user-delete', ['only' => ['destroy']]);
-         $this->middleware('permission:user-export', ['only' => ['exportUsers']]); // Permission spécifique pour l'export
+         $this->middleware('permission:user-export', ['only' => ['exportUsers']]);
     }
 
     public function index(Request $request)
@@ -123,7 +123,7 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-            'password' => 'nullable|string|min:8|confirmed', // 'confirmed' au lieu de 'same:confirm-password' si le champ est password_confirmation
+            'password' => 'nullable|string|min:8|confirmed',
             'roles' => 'required|array',
             'roles.*' => 'string|exists:roles,name',
             'telephone' => 'nullable|string|max:20',
@@ -193,7 +193,6 @@ class UserController extends Controller
         try {
             $import = new UsersImport();
             Excel::import($import, $request->file('excel_file'));
-
             $importedCount = $import->getImportedRowCount();
             $skippedCount = count($import->getSkippedRows());
             $skippedDetails = $import->getSkippedRows();
