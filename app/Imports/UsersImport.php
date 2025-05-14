@@ -18,18 +18,13 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
     private $importedRowCount = 0;
     private $skippedRows = [];
 
-    /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
     public function model(array $row)
     {
         $existingUser = User::where('email', $row['email'])->first();
         if ($existingUser) {
             $this->skippedRows[] = ['row_data' => $row, 'reason' => 'Email déjà existant.'];
             Log::warning("Importation Excel : Email déjà existant ignoré - " . $row['email']);
-            return null; // Ne pas créer l'utilisateur
+            return null;
         }
 
         $this->importedRowCount++;
@@ -49,11 +44,6 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         return $user;
     }
 
-    /**
-     * Définir les règles de validation pour chaque ligne.
-     *
-     * @return array
-     */
     public function rules(): array
     {
         return [
@@ -67,11 +57,6 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         ];
     }
 
-    /**
-     * Personnaliser les messages de validation.
-     *
-     * @return array
-     */
     public function customValidationMessages()
     {
         return [
@@ -84,12 +69,6 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         ];
     }
 
-    /**
-     * Gérer les erreurs de validation (ne saute pas la ligne, l'erreur est capturée par le contrôleur).
-     * Si vous voulez sauter la ligne, utilisez plutôt onError.
-     *
-     * @param Failure[] $failures
-     */
     public function onFailure(Failure ...$failures)
     {
         foreach ($failures as $failure) {
@@ -103,16 +82,10 @@ class UsersImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnErr
         }
     }
 
-    /**
-     * Gérer les erreurs générales (autres que la validation).
-     *
-     * @param Throwable $e
-     */
     public function onError(Throwable $e)
     {
         Log::error("Erreur d'importation Excel (onError): " . $e->getMessage() . " Trace: " . $e->getTraceAsString());
     }
-
 
     public function getImportedRowCount(): int
     {

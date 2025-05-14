@@ -45,15 +45,22 @@
 
                     <div class="mb-6 flex flex-col sm:flex-row justify-between items-center space-y-3 sm:space-y-0">
                         <form method="GET" action="{{ route('users.index') }}" class="w-full sm:w-auto">
-                            <div class="flex">
-                                <input  type="text" name="search" class="block w-full sm:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200" placeholder="Rechercher..." value="{{ request('search') }}">
-                                <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-r-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </form>
+    <div class="flex">
+        <input
+            type="text"
+            name="search"
+            class="block w-full sm:w-64 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-l-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-200"
+            placeholder="Rechercher..."
+            value="{{ request('search') }}">
+        <button
+            type="submit"
+            class="inline-flex items-center justify-center px-4 py-2 bg-indigo-600 border border-transparent rounded-r-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-500 active:bg-indigo-700 focus:outline-none focus:border-indigo-700 focus:ring ring-indigo-300 disabled:opacity-25 transition ease-in-out duration-150">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+            </svg>
+        </button>
+    </div>
+</form>
                         <form method="GET" action="{{ route('users.index') }}" class="w-full sm:w-auto">
                              <div class="flex items-center">
                                 <label for="per_page" class="mr-2 text-sm text-gray-700 dark:text-gray-300">Afficher:</label>
@@ -159,7 +166,6 @@
         </div>
     </div>
 
-
     @push('scripts')
     <script>
         function confirmDelete(id, userName) {
@@ -172,13 +178,13 @@
                 confirmButtonText: 'Oui, supprimer !',
                 cancelButtonText: 'Annuler',
                 customClass: {
-                    popup: document.documentElement.classList.contains('dark') ? 'dark:bg-gray-800 dark:text-gray-200 shadow-xl' : 'bg-white shadow-xl',
-                    title: document.documentElement.classList.contains('dark') ? 'text-gray-100' : 'text-gray-700',
-                    htmlContainer: document.documentElement.classList.contains('dark') ? 'text-gray-300' : 'text-gray-600',
-                    confirmButton: 'px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800',
-                    cancelButton: 'ml-3 px-4 py-2 bg-gray-200 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500 dark:focus:ring-offset-gray-800'
+                    popup: document.documentElement.classList.contains('dark') ? 'dark:bg-gray-800 dark:text-gray-200 shadow-xl rounded-lg' : 'bg-white shadow-xl rounded-lg',
+                    title: document.documentElement.classList.contains('dark') ? 'text-gray-100 text-xl font-semibold' : 'text-gray-800 text-xl font-semibold',
+                    htmlContainer: document.documentElement.classList.contains('dark') ? 'text-gray-300 text-sm' : 'text-gray-600 text-sm',
+                    confirmButton: 'inline-flex items-center justify-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-500 active:bg-red-700 focus:outline-none focus:border-red-700 focus:ring ring-red-300 disabled:opacity-25 transition ease-in-out duration-150',
+                    cancelButton: 'ml-3 inline-flex items-center justify-center px-4 py-2 bg-white dark:bg-gray-600 border border-gray-300 dark:border-gray-500 rounded-md font-semibold text-xs text-gray-700 dark:text-gray-300 uppercase tracking-widest shadow-sm hover:bg-gray-50 dark:hover:bg-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 disabled:opacity-25 transition ease-in-out duration-150'
                 },
-                buttonsStyling: false /
+                buttonsStyling: false
             }).then((result) => {
                 if (result.isConfirmed) {
                     document.getElementById('delete-form-' + id).submit();

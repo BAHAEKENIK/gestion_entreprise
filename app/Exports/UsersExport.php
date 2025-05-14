@@ -12,9 +12,6 @@ use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAutoSize, WithStyles
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
     public function collection()
     {
         return User::whereHas('roles', function ($query) {
@@ -27,9 +24,6 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         ->get();
     }
 
-    /**
-     * @return array
-     */
     public function headings(): array
     {
         return [
@@ -44,10 +38,6 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         ];
     }
 
-    /**
-     * @param User $user
-     * @return array
-     */
     public function map($user): array
     {
         return [
@@ -62,22 +52,15 @@ class UsersExport implements FromCollection, WithHeadings, WithMapping, ShouldAu
         ];
     }
 
-    /**
-     * Appliquer des styles à la feuille Excel.
-     *
-     * @param Worksheet $sheet
-     * @return array
-     */
     public function styles(Worksheet $sheet)
     {
         return [
-            // Style de la première ligne (en-têtes)
             1    => [
                 'font' => ['bold' => true, 'size' => 12, 'color' => ['argb' => 'FFFFFFFF']],
                 'alignment' => ['horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER],
                 'fill' => [
                     'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
-                    'startColor' => ['argb' => 'FF4F4F4F'], 
+                    'startColor' => ['argb' => 'FF4F4F4F'],
                 ],
             ],
             'A1:H' . ($this->collection()->count() + 1) => [

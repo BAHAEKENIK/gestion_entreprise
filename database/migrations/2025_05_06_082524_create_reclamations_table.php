@@ -6,26 +6,21 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('reclamations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('employe_id')->constrained('users')->comment('ID de l\'employé qui a soumis la réclamation (auteur)')->onUpdate('cascade')->onDelete('cascade');
+            $table->foreignId('directeur_id')->constrained('users')->comment('ID du directeur à qui la réclamation est adressée (destinataire/gestionnaire)')->onUpdate('cascade')->onDelete('cascade');
+            $table->string('sujet'); // Ajout d'un champ sujet pour plus de clarté
             $table->text('description');
-            $table->enum('statut',['soumise','en_cours_traitement'.'resolue','regetee']);
+            $table->enum('statut', ['soumise', 'en_cours_traitement', 'resolue', 'rejetee'])->default('soumise'); // Corrigé ici
             $table->text('reponse')->nullable();
-            $table->foreignId('employe_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
-            $table->foreignId('directeur_id')->constrained('users')->onUpdate('cascade')->onDelete('cascade');
-
-            $table->timestamps();
+            $table->timestamp('date_reponse')->nullable(); // Date à laquelle la réponse a été donnée
+            $table->timestamps(); // created_at sera la date de soumission
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('reclamations');

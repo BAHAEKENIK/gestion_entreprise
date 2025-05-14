@@ -16,6 +16,7 @@ class TacheController extends Controller
     {
         $this->middleware('auth');
     }
+
     public function indexDirecteur(Request $request)
     {
         $query = Tache::with(['employeAssignee', 'assignePar', 'documents'])
@@ -30,16 +31,12 @@ class TacheController extends Controller
 
         $taches = $query->paginate(15);
         $employes = User::whereHas('roles', fn($q) => $q->where('name', 'employe'))->orderBy('name')->get();
-        $statuts = ['a_faire', 'en_cours', 'terminee', 'en_revision', 'annulee']; // Pour le filtre
+        $statuts = ['a_faire', 'en_cours', 'terminee', 'en_revision', 'annulee'];
 
         return view('taches.directeur.index', compact('taches', 'employes', 'statuts'));
     }
 
-    /**
-     * Affiche le formulaire de création de tâche.
-     * Le paramètre $user est optionnel pour pré-remplir l'employé si on vient de la liste des employés.
-     */
-    public function create(User $user = null) 
+    public function create(User $user = null)
     {
         $employes = User::whereHas('roles', fn($q) => $q->where('name', 'employe'))->orderBy('name')->get();
         $selectedEmployeId = $user ? $user->id : null;
@@ -47,9 +44,6 @@ class TacheController extends Controller
         return view('taches.directeur.create', compact('employes', 'selectedEmployeId', 'statuts'));
     }
 
-    /**
-     * Enregistre une nouvelle tâche.
-     */
     public function store(Request $request)
     {
         $request->validate([
@@ -60,7 +54,7 @@ class TacheController extends Controller
             'date_debut_prevue' => 'nullable|date',
             'date_fin_prevue' => 'nullable|date|after_or_equal:date_debut_prevue',
             'duree_estimee' => 'nullable|string|max:100',
-            'document_tache' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,zip|max:10240', // 10MB max
+            'document_tache' => 'nullable|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,jpg,jpeg,png,zip|max:10240',
         ]);
 
         $tache = Tache::create([
@@ -92,10 +86,6 @@ class TacheController extends Controller
         return redirect()->route('taches.directeur.index')->with('success', 'Tâche assignée avec succès.');
     }
 
-
-    /**
-     * Affiche le formulaire d'édition d'une tâche pour le directeur.
-     */
     public function editDirecteur(Tache $tache)
     {
         $employes = User::whereHas('roles', fn($q) => $q->where('name', 'employe'))->orderBy('name')->get();
@@ -103,9 +93,6 @@ class TacheController extends Controller
         return view('taches.directeur.edit', compact('tache', 'employes', 'statuts'));
     }
 
-    /**
-     * Met à jour une tâche (par le directeur).
-     */
     public function updateDirecteur(Request $request, Tache $tache)
     {
         $request->validate([
@@ -131,9 +118,9 @@ class TacheController extends Controller
             $tache->save();
         }
 
-
         return redirect()->route('taches.directeur.index')->with('success', 'Tâche mise à jour avec succès.');
     }
+
     public function indexEmploye(Request $request)
     {
         $user = Auth::user();
@@ -146,14 +133,11 @@ class TacheController extends Controller
         }
 
         $taches = $query->paginate(15);
-        $statuts = ['a_faire', 'en_cours', 'terminee', 'en_revision', 'annulee']; // Pour le filtre
+        $statuts = ['a_faire', 'en_cours', 'terminee', 'en_revision', 'annulee'];
 
         return view('taches.employe.index', compact('taches', 'statuts'));
     }
 
-    /**
-     * Affiche le formulaire pour que l'employé "réalise" ou mette à jour une tâche.
-     */
     public function showRealisationForm(Tache $tache)
     {
         if ($tache->employe_id !== Auth::id()) {
@@ -163,9 +147,6 @@ class TacheController extends Controller
         return view('taches.employe.realiser', compact('tache', 'statutsPossiblesEmploye'));
     }
 
-    /**
-     * Soumet la réalisation/mise à jour d'une tâche par l'employé.
-     */
     public function submitRealisation(Request $request, Tache $tache)
     {
         if ($tache->employe_id !== Auth::id()) {
@@ -195,7 +176,6 @@ class TacheController extends Controller
             $tache->save();
         }
 
-
         if ($request->hasFile('document_realisation')) {
             $file = $request->file('document_realisation');
             $path = $file->store('documents_taches_realisation', 'public');
@@ -213,9 +193,6 @@ class TacheController extends Controller
         return redirect()->route('taches.employe.index')->with('success', 'Tâche mise à jour avec succès.');
     }
 
-    /**
-     * Affiche les détails d'une tâche.
-     */
     public function show(Tache $tache)
     {
         $user = Auth::user();
@@ -226,9 +203,6 @@ class TacheController extends Controller
         return view('taches.show', compact('tache'));
     }
 
-    /**
-     * Supprime une tâche (uniquement par le directeur).
-     */
     public function destroy(Tache $tache)
     {
         foreach ($tache->documents as $document) {
@@ -239,9 +213,6 @@ class TacheController extends Controller
         return redirect()->route('taches.directeur.index')->with('success', 'Tâche supprimée avec succès.');
     }
 
-    /**
-     * Télécharge un document associé à une tâche.
-     */
     public function telechargerDocumentTache(Tache $tache, Document $document)
     {
         $user = Auth::user();

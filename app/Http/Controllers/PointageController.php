@@ -96,6 +96,7 @@ class PointageController extends Controller
 
         return redirect()->route('pointages.index')->with('success', 'Départ pointé avec succès.');
     }
+
     public function historiqueEmploye(User $user, Request $request)
     {
         if (!$user->hasRole('employe')) {

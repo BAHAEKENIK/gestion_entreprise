@@ -26,7 +26,7 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $query = User::query();
+        $query=User::query();
 
         $query->whereDoesntHave('roles', function ($q_roles) {
             $q_roles->where('name', 'directeur');
@@ -140,7 +140,13 @@ class UserController extends Controller
 
         $newRoles = $request->input('roles');
         if (in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
+             return redirect()->back()
+                             ->withErrors(['roles' => 'Vous n\'êtes pas autorisé à assigner le rôle "directeur".'])
+                             ->withInput();
         } else if (in_array('directeur', $user->getRoleNames()->toArray()) && !in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
+             return redirect()->back()
+                             ->withErrors(['roles' => 'Vous ne pouvez pas retirer le rôle "directeur" à cet utilisateur.'])
+                             ->withInput();
         }
         $user->syncRoles($newRoles);
 
@@ -165,42 +171,34 @@ class UserController extends Controller
                          ->with('success','Utilisateur supprimé avec succès.');
     }
 
-    /**
-     * Export users data to Excel.
-     */
     public function exportUsers()
     {
         return Excel::download(new UsersExport, 'utilisateurs_employes_'.date('Y-m-d_H-i').'.xlsx');
     }
 
-    /**
-     * Show the form for importing users.
-     */
     public function importUsersForm()
     {
         return view('users.import');
     }
 
-    /**
-     * Handle the import of users from Excel.
-     */
     public function importUsers(Request $request)
     {
         $request->validate([
-            'excel_file' => 'required|mimes:xlsx,xls|max:10240', // Max 10MB
+            'excel_file' => 'required|mimes:xlsx,xls|max:10240',
         ]);
 
         try {
             $import = new UsersImport();
             Excel::import($import, $request->file('excel_file'));
             $importedCount = $import->getImportedRowCount();
-            $skippedCount = count($import->getSkippedRows());
-            $skippedDetails = $import->getSkippedRows();
+            $skippedRows = $import->getSkippedRowsLog();
+            $skippedCount = count($skippedRows);
 
             $message = $importedCount . ' utilisateur(s) importé(s) avec succès.';
             if ($skippedCount > 0) {
-                $message .= ' ' . $skippedCount . ' ligne(s) ont été ignorées (ex: email dupliqué).';
-                Log::warning("Importation Excel - Lignes ignorées: " . json_encode($skippedDetails));
+                $message .= ' ' . $skippedCount . ' ligne(s) ont été ignorées.';
+                session()->flash('import_skipped_details', $skippedRows);
+                Log::warning("Importation Excel - Lignes ignorées: " . json_encode($skippedRows));
             }
 
             return redirect()->route('users.index')->with('success', $message);
@@ -209,13 +207,17 @@ class UserController extends Controller
              $failures = $e->failures();
              $errorMessages = [];
              foreach ($failures as $failure) {
-                 $errorMessages[] = 'Ligne ' . $failure->row() . ': ' . implode(', ', $failure->errors()) . ' (pour la colonne ' . $failure->attribute() . ' avec la valeur: \'' . $failure->values()[$failure->attribute() ?? array_key_first($failure->values())] . '\')';
+                 $errorMessages[] = 'Ligne ' . $failure->row() . ': ' . implode(', ', $failure->errors()) . ' (colonne ' . $failure->attribute() . ', valeur: \'' . ($failure->values()[$failure->attribute()] ?? 'N/A') . '\')';
              }
-             Log::error("Erreurs de validation d'importation Excel: " . implode('; ', $errorMessages));
-             return redirect()->route('users.import.form')->with('import_errors', $errorMessages)->withInput();
+             Log::error("Erreurs de validation d'importation Excel (globale): " . implode('; ', $errorMessages));
+             return redirect()->route( $request->input('from_modal') ? 'users.index' : 'users.import.form' )
+                              ->with('import_errors', $errorMessages)
+                              ->withInput();
         } catch (\Exception $e) {
             Log::error("Erreur générale d'importation Excel: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
-            return redirect()->route('users.import.form')->with('error', 'Une erreur est survenue lors de l\'importation: ' . $e->getMessage())->withInput();
+            return redirect()->route( $request->input('from_modal') ? 'users.index' : 'users.import.form' )
+                              ->with('error', 'Une erreur est survenue lors de l\'importation: ' . $e->getMessage())
+                              ->withInput();
         }
     }
 }
