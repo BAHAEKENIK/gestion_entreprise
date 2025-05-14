@@ -26,12 +26,11 @@ class UserController extends Controller
 
     public function index(Request $request)
     {
-        $query=User::query();
+        $query = User::query();
 
         $query->whereDoesntHave('roles', function ($q_roles) {
             $q_roles->where('name', 'directeur');
         });
-
 
         if ($request->filled('search')) {
             $searchTerm = $request->search;
@@ -40,6 +39,7 @@ class UserController extends Controller
                          ->orWhere('email', 'LIKE', "%{$searchTerm}%");
             });
         }
+
         $users = $query->orderBy('name')->paginate($request->input('per_page', 7));
 
         return view('users.index',compact('users'))
@@ -139,11 +139,16 @@ class UserController extends Controller
         $user->update($input);
 
         $newRoles = $request->input('roles');
-        if (in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
+
+        if (in_array('directeur', $newRoles) &&
+            !in_array('directeur', $user->getRoleNames()->toArray()) &&
+            !$request->user()->hasRole('super-admin')) {
              return redirect()->back()
                              ->withErrors(['roles' => 'Vous n\'êtes pas autorisé à assigner le rôle "directeur".'])
                              ->withInput();
-        } else if (in_array('directeur', $user->getRoleNames()->toArray()) && !in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
+        } else if (in_array('directeur', $user->getRoleNames()->toArray()) &&
+                   !in_array('directeur', $newRoles) &&
+                   !$request->user()->hasRole('super-admin')) {
              return redirect()->back()
                              ->withErrors(['roles' => 'Vous ne pouvez pas retirer le rôle "directeur" à cet utilisateur.'])
                              ->withInput();
@@ -210,12 +215,14 @@ class UserController extends Controller
                  $errorMessages[] = 'Ligne ' . $failure->row() . ': ' . implode(', ', $failure->errors()) . ' (colonne ' . $failure->attribute() . ', valeur: \'' . ($failure->values()[$failure->attribute()] ?? 'N/A') . '\')';
              }
              Log::error("Erreurs de validation d'importation Excel (globale): " . implode('; ', $errorMessages));
-             return redirect()->route( $request->input('from_modal') ? 'users.index' : 'users.import.form' )
+             $redirectRoute = $request->input('from_modal') ? 'users.index' : 'users.import.form';
+             return redirect()->route($redirectRoute)
                               ->with('import_errors', $errorMessages)
                               ->withInput();
         } catch (\Exception $e) {
             Log::error("Erreur générale d'importation Excel: " . $e->getMessage() . "\nTrace: " . $e->getTraceAsString());
-            return redirect()->route( $request->input('from_modal') ? 'users.index' : 'users.import.form' )
+            $redirectRoute = $request->input('from_modal') ? 'users.index' : 'users.import.form';
+            return redirect()->route($redirectRoute)
                               ->with('error', 'Une erreur est survenue lors de l\'importation: ' . $e->getMessage())
                               ->withInput();
         }

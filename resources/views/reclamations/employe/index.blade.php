@@ -26,7 +26,7 @@
                         <div class="flex items-end space-x-3">
                             <div>
                                 <x-input-label for="statut_filter" :value="__('Filtrer par Statut')" />
-                                <select name="statut_filter" id="statut_filter" class="block mt-1 w-full md:w-auto border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm text-sm">
+                                <select style="width:1000px" name="statut_filter" id="statut_filter" class="block mt-1 w-full md:w-auto border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 focus:border-indigo-500 dark:focus:border-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-600 rounded-md shadow-sm text-sm">
                                     <option value="">Tous les statuts</option>
                                     @foreach ($statuts as $statut)
                                         <option value="{{ $statut }}" {{ request('statut_filter') == $statut ? 'selected' : '' }}>
@@ -35,7 +35,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <x-primary-button type="submit" class="h-10 text-sm">
+                            <x-primary-button  type="submit" class="h-10 text-sm">
                                 {{ __('Filtrer') }}
                             </x-primary-button>
                         </div>
