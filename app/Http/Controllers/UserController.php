@@ -21,7 +21,7 @@ class UserController extends Controller
          $this->middleware('permission:user-create', ['only' => ['create','store', 'importUsersForm', 'importUsers']]);
          $this->middleware('permission:user-edit', ['only' => ['edit','update']]);
          $this->middleware('permission:user-delete', ['only' => ['destroy']]);
-         $this->middleware('permission:user-export', ['only' => ['exportUsers']]);
+         $this->middleware('permission:user-export', ['only' => ['exportUsers']]); // Permission spécifique pour l'export
     }
 
     public function index(Request $request)
@@ -67,7 +67,7 @@ class UserController extends Controller
         ]);
 
         $input = $request->only(['name', 'email', 'telephone', 'post', 'statut', 'date_embauche']);
-        $defaultPassword = 'password123'; // Changez ceci
+        $defaultPassword = 'password123';
         $input['password'] = Hash::make($defaultPassword);
         $input['must_change_password'] = true;
         $input['theme'] = 'light';
@@ -123,7 +123,7 @@ class UserController extends Controller
         $this->validate($request, [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users,email,'.$id,
-            'password' => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8|confirmed', // 'confirmed' au lieu de 'same:confirm-password' si le champ est password_confirmation
             'roles' => 'required|array',
             'roles.*' => 'string|exists:roles,name',
             'telephone' => 'nullable|string|max:20',
@@ -140,9 +140,7 @@ class UserController extends Controller
 
         $newRoles = $request->input('roles');
         if (in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
-
         } else if (in_array('directeur', $user->getRoleNames()->toArray()) && !in_array('directeur', $newRoles) && !$request->user()->hasRole('super-admin')) {
-
         }
         $user->syncRoles($newRoles);
 
@@ -196,8 +194,6 @@ class UserController extends Controller
             $import = new UsersImport();
             Excel::import($import, $request->file('excel_file'));
 
-           
-
             $importedCount = $import->getImportedRowCount();
             $skippedCount = count($import->getSkippedRows());
             $skippedDetails = $import->getSkippedRows();
@@ -205,7 +201,6 @@ class UserController extends Controller
             $message = $importedCount . ' utilisateur(s) importé(s) avec succès.';
             if ($skippedCount > 0) {
                 $message .= ' ' . $skippedCount . ' ligne(s) ont été ignorées (ex: email dupliqué).';
-                // Vous pouvez passer $skippedDetails à la session pour les afficher si vous le souhaitez.
                 Log::warning("Importation Excel - Lignes ignorées: " . json_encode($skippedDetails));
             }
 
