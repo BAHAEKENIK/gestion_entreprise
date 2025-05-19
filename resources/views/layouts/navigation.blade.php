@@ -62,7 +62,7 @@
             <!-- Settings Dropdown & Theme Toggle -->
             <div class="hidden sm:flex sm:items-center sm:ml-6">
                  <!-- Theme Toggle Button - Déplacé ici pour une meilleure visibilité à côté du dropdown utilisateur -->
-                
+
 
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
